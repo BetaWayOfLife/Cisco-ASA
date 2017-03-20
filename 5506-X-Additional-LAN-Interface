@@ -1,0 +1,35 @@
+!
+! Cisco ASA 5506-X Additional LAN Interface
+!
+
+en
+conf t
+
+! LAN2 interface
+interface GigabitEthernet1/3
+description LAN2
+nameif inside2
+security-level 100
+ip address xxx.xxx.xxx.xxx sss.sss.sss.sss
+no shut
+
+! NAT from LAN2 to WAN
+nat (inside2,outside) after-auto source dynamic any interface
+
+! DHCP server on the LAN interface
+dhcpd address xxx.xxx.xxx.xxx-xxx.xxx.xxx.xxx inside2
+dhcpd dns xxx.xxx.xxx.xxx xxx.xxx.xxx.xxx interface inside2
+dhcpd domain domain.loc interface inside2
+dhcpd enable inside2
+
+! enable internal routing
+! permits traffic from one interface to another on the same security level
+same-security-traffic permit inter-interface
+same-security-traffic permit intra-interface
+
+! write to startup config
+end
+copy running-config startup-config
+
+! restart asa
+reload noconfirm
